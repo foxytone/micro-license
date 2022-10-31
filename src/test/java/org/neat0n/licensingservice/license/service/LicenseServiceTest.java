@@ -86,8 +86,11 @@ class LicenseServiceTest {
     void createLicense() {
         //given
         Mockito.when(licenseRepository.save(this.license)).thenReturn(this.license);
-        //then
+        
+        //when
         License returnedLicense = this.licenseService.createLicense(license, license.getOrganizationId());
+        
+        //then
         assertEquals(this.license, returnedLicense);
     }
     @Test
