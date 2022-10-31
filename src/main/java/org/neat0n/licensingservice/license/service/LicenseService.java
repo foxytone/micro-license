@@ -20,7 +20,7 @@ import java.util.concurrent.TimeoutException;
 
 @Service
 @Log4j2
-@PropertySource("messages_en.properties")
+@PropertySource("classpath:messages_en.properties")
 public class LicenseService {
     private final String serviceName = "licenseService";
     
