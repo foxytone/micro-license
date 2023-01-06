@@ -1,4 +1,4 @@
-package org.neat0n.licensingservice;
+package org.neat0n.licensingservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

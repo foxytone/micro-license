@@ -1,4 +1,4 @@
-package org.neat0n.licensingservice.license.config;
+package org.neat0n.licensingservice.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

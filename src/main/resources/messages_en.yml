@@ -1,0 +1,22 @@
+log:
+  license:
+    error:
+      create: error in getLicense with licenseId %s and organizationId %s
+      undefined: error in undefined method
+
+
+license:
+  message:
+    create: License created %s
+    update: License %s updated
+    delete: Deleting license with id %s for the organization %s successful
+  error:
+    "101": No license with licenseId {0} and organizationId {1} found
+    create: Cannot create license with %s licenseId and %s organization
+    update: Cannot update license with %s licenseId and %s organization
+    delete: Cannot delete license with %s licenseId and %s organization
+    not-found: deleted license %s not found
+
+
+
+

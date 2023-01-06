@@ -5,31 +5,36 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
+import org.hibernate.annotations.GeneratorType;
+import org.hibernate.annotations.GenericGenerator;
+import org.neat0n.licensingservice.license.model.generator.UUIDGenerator;
 import org.springframework.hateoas.RepresentationModel;
-import org.springframework.stereotype.Service;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 @Setter
 @ToString
 @Entity
-public class License extends RepresentationModel<License>{
+public class License extends RepresentationModel<License> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
     private long id;
     
-    @Column(nullable = false)
-    @Size(min = 36, max=36)
-    private String licenseId;
+    @GeneratorType(type = UUIDGenerator.class, when = GenerationTime.INSERT)
+    @Column(unique = true, nullable = false, updatable = false)
+
+    private UUID licenseId;
     
     private String description;
     
     @Column(nullable = false)
-    private String organizationId;
+    private long organizationId;
     
     private String productName;
     
@@ -52,6 +57,7 @@ public class License extends RepresentationModel<License>{
     
     @Override
     public int hashCode() {
-        return (int) (37*id*getClass().hashCode());
+        return (int) (37 * id * getClass().hashCode());
     }
+    
 }
