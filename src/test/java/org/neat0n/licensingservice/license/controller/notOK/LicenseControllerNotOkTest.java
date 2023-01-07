@@ -2,11 +2,13 @@ package org.neat0n.licensingservice.license.controller.notOK;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import lombok.var;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neat0n.licensingservice.exceptions.Errors;
 import org.neat0n.licensingservice.exceptions.LicenseServiceException;
+import org.neat0n.licensingservice.exceptions.causes.ExceptionCause;
 import org.neat0n.licensingservice.exceptions.interfaces.ExceptionToCauseConstructor;
 import org.neat0n.licensingservice.license.model.License;
 import org.neat0n.licensingservice.license.repo.LicenseRepository;
@@ -78,14 +80,28 @@ public class LicenseControllerNotOkTest {
 
     @Test
     @SneakyThrows
-    void tooMuch(){
-        license1.setProductName("*****************************************************************************");
+    void tooMuchProductName(){
+        license1.setProductName("*********************************************************************");
+        ExceptionCause cause = new ExceptionCause();
         mvc.perform(
                 put(putUri)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(license1))
         )
                 .andExpect(status().is5xxServerError())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(mapper.writeValueAsString(license1)));
+    }
+    
+    @Test
+    @SneakyThrows
+    void wrongOrgId(){
+        mvc.perform(
+                get("/api/v1/organization/4/license/")
+        ).andExpect(status().is4xxClientError());
+        
+        mvc.perform(
+                get("/api/v1/organization/meh/license/")
+        ).andExpect(status().is4xxClientError());
     }
 }

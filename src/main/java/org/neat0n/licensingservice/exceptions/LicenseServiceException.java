@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class LicenseServiceException extends Exception {
+public class LicenseServiceException extends RuntimeException {
     private final String licenseUuid;
     private final long organizationId;
     private final Errors code;

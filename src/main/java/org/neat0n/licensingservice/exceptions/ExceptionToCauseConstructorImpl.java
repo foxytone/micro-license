@@ -23,8 +23,9 @@ public class ExceptionToCauseConstructorImpl implements ExceptionToCauseConstruc
                 exception.getLicenseUuid(),
                 exception.getOrganizationId(),
                 exception.getCode(),
+                exception.getCode().getId(),
                 messageSource.getMessage(
-                        messagePrefix + exception.getCode(),
+                        messagePrefix + exception.getCode().getId(),
                         new Object[]{exception.getLicenseUuid(),
                                 exception.getOrganizationId()},
                         Locale.US));

@@ -1,6 +1,7 @@
 package org.neat0n.licensingservice.license.controller;
 
 import org.neat0n.licensingservice.aspects.annotations.GetLicenseErrorHandler;
+import org.neat0n.licensingservice.aspects.annotations.LicenseConstrainCheck;
 import org.neat0n.licensingservice.exceptions.LicenseServiceException;
 import org.neat0n.licensingservice.license.model.License;
 import org.neat0n.licensingservice.license.service.LicenseService;
@@ -28,6 +29,8 @@ public class LicenseController {
     }
 
     @PutMapping
+    @GetLicenseErrorHandler
+    @LicenseConstrainCheck
     public ResponseEntity<License> updateLicense(
             @PathVariable("organizationId")
             long organizationId,

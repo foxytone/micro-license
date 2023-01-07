@@ -12,6 +12,12 @@ license:
     delete: Deleting license with id %s for the organization %s successful
   error:
     "101": No license with licenseId {0} and organizationId {1} found
+    "102": Empty LicenseUUID
+    "103": Empty OrganizationId
+    "104": Invalid license type length. Must be in range 3 - 40
+    "105": Invalid license description length. Must be in range 10 - 120
+    "106": Invalid license product name length. Must be in range 3 - 40
+    "107": Invalid license comment length. Must be less than 400
     create: Cannot create license with %s licenseId and %s organization
     update: Cannot update license with %s licenseId and %s organization
     delete: Cannot delete license with %s licenseId and %s organization
