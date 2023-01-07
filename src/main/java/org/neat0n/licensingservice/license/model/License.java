@@ -5,10 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.GenerationTime;
 import org.hibernate.annotations.GeneratorType;
-import org.hibernate.annotations.GenericGenerator;
 import org.neat0n.licensingservice.license.model.generator.UUIDGenerator;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -28,18 +26,19 @@ public class License extends RepresentationModel<License> {
     
     @GeneratorType(type = UUIDGenerator.class, when = GenerationTime.INSERT)
     @Column(unique = true, nullable = false, updatable = false)
+    @Setter(AccessLevel.NONE)
+    private String uuid;
 
-    private UUID licenseId;
-    
+    @Column(length = 120)
     private String description;
     
     @Column(nullable = false)
-    private long organizationId;
-    
+    private Long organizationId;
+    @Column(length = 40)
     private String productName;
-    
+    @Column(length = 40)
     private String licenseType;
-    
+    @Column(length = 400)
     private String comment;
     
     public License withComment(String comment) {

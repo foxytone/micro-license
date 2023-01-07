@@ -24,14 +24,14 @@ import java.util.UUID;
 @PropertySource("classpath:messages_en.properties")
 public class LicenseService {
     private final String serviceName = "licenseService";
-    
+
     @Autowired
     MessageSource messages;
     @Autowired
     LicenseRepository licenseRepository;
     @Autowired
     ServiceConfig serviceConfig;
-    
+
     //error messages block
     @Value("${license.search.error.message}")
     private String searchErrorMessage;
@@ -44,23 +44,21 @@ public class LicenseService {
     //messages block
     @Value("${license.delete.licenseNotFound.message}")
     private String deleteLicenseNotFoundMessage;
-    
+
     @Value("${license.delete.message}")
     private String deleteMessage;
-    
-    
+
+
     @CircuitBreaker(name = "licenseService")
-    @SneakyThrows
-    public License getLicense(UUID licenseId, long organizationId) {
+    public License getLicense(String licenseUuid, long organizationId) throws LicenseServiceException {
         var license = licenseRepository
-                .findByOrganizationIdAndLicenseId(organizationId, licenseId)
-                .orElseThrow(() -> new LicenseServiceException(licenseId, organizationId, Errors.NO_LICENSE_FOUND));
+                .findByOrganizationIdAndUuid(organizationId, licenseUuid)
+                .orElseThrow(() -> new LicenseServiceException(licenseUuid, organizationId, Errors.NO_LICENSE_FOUND));
         return license.withComment(serviceConfig.getProperty());
     }
-    
+
     @CircuitBreaker(name = serviceName)
     public License createLicense(@NonNull License license, long organizationId) {
-        license.setLicenseId(UUID.randomUUID());
         license.setOrganizationId(organizationId);
         try {
             licenseRepository.save(license);
@@ -69,7 +67,7 @@ public class LicenseService {
                     license,
                     organizationId,
                     Arrays.toString(ex.getStackTrace())));
-            
+
             throw new IllegalArgumentException(
                     String.format(messages.getMessage(this.createErrorMessage, null, null),
                             license, organizationId)
@@ -78,32 +76,17 @@ public class LicenseService {
         log.info("license %s created".formatted(license));
         return license.withComment(serviceConfig.getProperty());
     }
-    
+
     @CircuitBreaker(name = serviceName)
     public License updateLicense(@NonNull License license, long organizationId) {
-        if (license.getOrganizationId() == 0) {
-            license.setOrganizationId(organizationId);
-        }
-        License savedLicense;
-        try {
-            savedLicense = licenseRepository.save(license);
-        } catch (Exception ex) {
-            log.error(String.format("error in updateLicense with %s license and %s organizationId\nexception stacktrace:\n%s",
-                    license,
-                    organizationId,
-                    Arrays.toString(ex.getStackTrace())));
-            throw new IllegalArgumentException(
-                    String.format(messages.getMessage(this.updateErrorMessage, null, null),
-                            license, organizationId));
-        }
-        log.info("license %s saved".formatted(license));
+        var savedLicense = licenseRepository.save(license);
         return savedLicense.withComment(serviceConfig.getProperty());
     }
-    
+
     @CircuitBreaker(name = serviceName)
-    public String deleteLicense(UUID licenseId, long organizationId) {
-        var license = licenseRepository.findByOrganizationIdAndLicenseId(organizationId, licenseId);
-        
+    public String deleteLicense(String licenseId, long organizationId) {
+        var license = licenseRepository.findByOrganizationIdAndUuid(organizationId, licenseId);
+
         String responseMessage;
         if (license.isPresent()) {
             responseMessage = String.format(this.deleteLicenseNotFoundMessage, licenseId, organizationId);

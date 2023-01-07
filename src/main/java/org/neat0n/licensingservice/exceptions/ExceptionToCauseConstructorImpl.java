@@ -20,12 +20,12 @@ public class ExceptionToCauseConstructorImpl implements ExceptionToCauseConstruc
     @Override
     public @NonNull ExceptionCause construct(@NonNull LicenseServiceException exception) {
         return new ExceptionCause(
-                exception.getLicenseId(),
+                exception.getLicenseUuid(),
                 exception.getOrganizationId(),
                 exception.getCode(),
                 messageSource.getMessage(
                         messagePrefix + exception.getCode(),
-                        new Object[]{exception.getLicenseId(),
+                        new Object[]{exception.getLicenseUuid(),
                                 exception.getOrganizationId()},
                         Locale.US));
     }

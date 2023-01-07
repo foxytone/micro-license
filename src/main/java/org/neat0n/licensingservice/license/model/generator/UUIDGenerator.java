@@ -5,11 +5,11 @@ import org.hibernate.tuple.ValueGenerator;
 
 import java.util.UUID;
 
-public class UUIDGenerator implements ValueGenerator<UUID> {
+public class UUIDGenerator implements ValueGenerator<String> {
 
     
     @Override
-    public UUID generateValue(Session session, Object owner) {
-        return UUID.randomUUID();
+    public String generateValue(Session session, Object owner) {
+        return UUID.randomUUID().toString();
     }
 }

@@ -5,6 +5,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.hibernate.exception.ConstraintViolationException;
 import org.neat0n.licensingservice.exceptions.LicenseServiceException;
 import org.neat0n.licensingservice.exceptions.causes.ExceptionCause;
 import org.neat0n.licensingservice.exceptions.interfaces.ExceptionToCauseConstructor;
@@ -26,10 +27,13 @@ public class ThrowControlHandler {
         } catch (LicenseServiceException ex) {
             return errorResponse(ex);
         }
+        catch (ConstraintViolationException constEx){
+            System.out.println("achieved!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            return ResponseEntity.internalServerError().body(constEx);
+        }
     }
     
     private ResponseEntity<ExceptionCause> errorResponse(LicenseServiceException exception) {
         return ResponseEntity.internalServerError().body(causeConstructor.construct(exception));
-        
     }
 }

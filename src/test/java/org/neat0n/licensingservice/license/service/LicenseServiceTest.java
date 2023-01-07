@@ -1,5 +1,6 @@
 package org.neat0n.licensingservice.license.service;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -8,7 +9,6 @@ import org.neat0n.licensingservice.license.model.License;
 import org.neat0n.licensingservice.license.repo.LicenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.MessageSource;
 
@@ -17,7 +17,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+//@SpringBootTest
 class LicenseServiceTest {
     @Autowired
     MessageSource messages;
@@ -40,40 +40,37 @@ class LicenseServiceTest {
     
     @BeforeEach
     void setUp() {
-        this.licenseId = UUID.randomUUID();
-        
-        this.license.setLicenseId(licenseId);
-        this.license.setOrganizationId(1);
-        
+        this.license.setOrganizationId(1L);
         Mockito.when(serviceConfig.getProperty()).thenReturn("someComment");
     }
     
     @Test
+    @SneakyThrows
     void getLicense() {
         
-        Mockito.when(licenseRepository.findByOrganizationIdAndLicenseId(
+        Mockito.when(licenseRepository.findByOrganizationIdAndUuid(
                         this.license.getOrganizationId(),
-                        this.license.getLicenseId()))
+                        this.license.getUuid()))
                 .thenReturn(Optional.of(this.license));
         Mockito.when(license.withComment(this.serviceConfig.getProperty())).thenReturn(license);
         
         //when
         License returnedLicense = licenseService.getLicense(
-                this.license.getLicenseId(), this.license.getOrganizationId());
+                this.license.getUuid(), this.license.getOrganizationId());
         //then
         assertEquals(license, returnedLicense);
     }
     
     @Test
     void getLicenseWillThrow() {
-        Mockito.when(licenseRepository.findByOrganizationIdAndLicenseId(
+        Mockito.when(licenseRepository.findByOrganizationIdAndUuid(
                         this.license.getOrganizationId(),
-                        this.license.getLicenseId()))
+                        this.license.getUuid()))
                 .thenReturn(null);
         
         assertThrows(IllegalArgumentException.class,
                 () -> licenseService.getLicense(
-                        this.license.getLicenseId(),
+                        this.license.getUuid(),
                         this.license.getOrganizationId()));
     }
     
