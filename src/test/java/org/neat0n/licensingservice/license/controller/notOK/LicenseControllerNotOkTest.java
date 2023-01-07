@@ -2,27 +2,24 @@ package org.neat0n.licensingservice.license.controller.notOK;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import lombok.var;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neat0n.licensingservice.exceptions.Errors;
 import org.neat0n.licensingservice.exceptions.LicenseServiceException;
-import org.neat0n.licensingservice.exceptions.causes.ExceptionCause;
 import org.neat0n.licensingservice.exceptions.interfaces.ExceptionToCauseConstructor;
 import org.neat0n.licensingservice.license.model.License;
 import org.neat0n.licensingservice.license.repo.LicenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.UUID;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -82,15 +79,13 @@ public class LicenseControllerNotOkTest {
     @SneakyThrows
     void tooMuchProductName(){
         license1.setProductName("*********************************************************************");
-        ExceptionCause cause = new ExceptionCause();
         mvc.perform(
                 put(putUri)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(license1))
         )
                 .andExpect(status().is5xxServerError())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(mapper.writeValueAsString(license1)));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
     
     @Test

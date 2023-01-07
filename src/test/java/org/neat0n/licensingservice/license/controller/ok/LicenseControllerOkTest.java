@@ -61,14 +61,14 @@ class LicenseControllerOkTest {
                 get(getUri + license1.getUuid())
         )
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType("application/hal+json"))
                 .andExpect(content().json(mapper.writeValueAsString(license1)));
 
         mvc.perform(
                 get(getUri + license2.getUuid())
         )
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType("application/hal+json"))
                 .andExpect(content().json(mapper.writeValueAsString(license2)));
     }
     @Test

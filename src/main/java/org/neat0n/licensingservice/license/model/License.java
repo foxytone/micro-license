@@ -26,7 +26,6 @@ public class License extends RepresentationModel<License> {
     
     @GeneratorType(type = UUIDGenerator.class, when = GenerationTime.INSERT)
     @Column(unique = true, nullable = false, updatable = false)
-    @Setter(AccessLevel.NONE)
     private String uuid;
 
     @Column(length = 120)

@@ -17,37 +17,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@Log4j2
-@PropertySource("classpath:messages_en.properties")
 public class LicenseService {
     private final String serviceName = "licenseService";
-
-    @Autowired
-    MessageSource messages;
     @Autowired
     LicenseRepository licenseRepository;
     @Autowired
     ServiceConfig serviceConfig;
-
-    //error messages block
-    @Value("${license.search.error.message}")
-    private String searchErrorMessage;
-    @Value("${license.create.error.message}")
-    private String createErrorMessage;
-    @Value("${license.update.error.message}")
-    private String updateErrorMessage;
-    @Value("${license.delete.error.message}")
-    private String deleteErrorMessage;
-    //messages block
-    @Value("${license.delete.licenseNotFound.message}")
-    private String deleteLicenseNotFoundMessage;
-
-    @Value("${license.delete.message}")
-    private String deleteMessage;
-
 
     @CircuitBreaker(name = "licenseService")
     public License getLicense(String licenseUuid, long organizationId) throws LicenseServiceException {
@@ -59,52 +38,29 @@ public class LicenseService {
 
     @CircuitBreaker(name = serviceName)
     public License createLicense(@NonNull License license, long organizationId) {
-        license.setOrganizationId(organizationId);
-        try {
-            licenseRepository.save(license);
-        } catch (Exception ex) {
-            log.error(String.format("error in createLicense with %s license and %s organizationId\nexception stacktrace:\n%s",
-                    license,
-                    organizationId,
-                    Arrays.toString(ex.getStackTrace())));
-
-            throw new IllegalArgumentException(
-                    String.format(messages.getMessage(this.createErrorMessage, null, null),
-                            license, organizationId)
-            );
+        Optional<License> possibleLicense = licenseRepository.findByOrganizationIdAndUuid(organizationId, license.getUuid());
+        if (possibleLicense.isPresent()){
+            throw new LicenseServiceException(license.getUuid(), organizationId, Errors.LICENSE_ALREADY_EXIST);
         }
-        log.info("license %s created".formatted(license));
-        return license.withComment(serviceConfig.getProperty());
-    }
-
-    @CircuitBreaker(name = serviceName)
-    public License updateLicense(@NonNull License license, long organizationId) {
+        license.setUuid(null);
+        license.setOrganizationId(organizationId);
         var savedLicense = licenseRepository.save(license);
         return savedLicense.withComment(serviceConfig.getProperty());
     }
 
     @CircuitBreaker(name = serviceName)
-    public String deleteLicense(String licenseId, long organizationId) {
-        var license = licenseRepository.findByOrganizationIdAndUuid(organizationId, licenseId);
+    public License updateLicense(@NonNull License license, long organizationId) {
+        licenseRepository
+                .findByOrganizationIdAndUuid(organizationId, license.getUuid())
+                .orElseThrow(() -> new LicenseServiceException(license.getUuid(), organizationId, Errors.NO_LICENSE_FOUND));
+        license.setOrganizationId(organizationId);
+        var savedLicense = licenseRepository.save(license);
+        return savedLicense.withComment(serviceConfig.getProperty());
+    }
 
-        String responseMessage;
-        if (license.isPresent()) {
-            responseMessage = String.format(this.deleteLicenseNotFoundMessage, licenseId, organizationId);
-        } else {
-            try {
-                licenseRepository.delete(license.get());
-            } catch (Exception ex) {
-                log.error(String.format("error in updateLicense with %s license and %s organizationId\nexception stacktrace:\n%s",
-                        license,
-                        organizationId,
-                        Arrays.toString(ex.getStackTrace())));
-                throw new IllegalArgumentException(
-                        String.format(messages.getMessage(this.deleteErrorMessage, null, Locale.US),
-                                license, organizationId));
-            }
-            responseMessage = String.format(this.deleteMessage, licenseId, organizationId);
-        }
-        log.info("license %s deleted".formatted(license));
-        return responseMessage;
+    @CircuitBreaker(name = serviceName)
+    public boolean deleteLicense(String licenseUuid) {
+        licenseRepository.deleteByUuid(licenseUuid);
+        return true;
     }
 }

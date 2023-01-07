@@ -11,4 +11,5 @@ public interface LicenseRepository extends CrudRepository<License, Long> {
     List<License> findByOrganizationId(long organizationId);
     
     Optional<License> findByOrganizationIdAndUuid(long organizationId, String licenseId);
+    void deleteByUuid(String licenseUuid);
 }

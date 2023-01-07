@@ -16,12 +16,12 @@ import java.util.Locale;
 import java.util.Properties;
 
 @Component
-public class MessageConfiguration {
+public class LocaleConfiguration {
     @Autowired
     ConfigurableApplicationContext context;
     
     @Bean
-    LocaleResolver localeTrashResolver(){
+    LocaleResolver localeResolver(){
         var localeResolver = new SessionLocaleResolver();
         localeResolver.setDefaultLocale(Locale.US);
         return localeResolver;
@@ -34,8 +34,7 @@ public class MessageConfiguration {
         return bean.getObject();
     }
     @Bean
-    @Primary
-    ResourceBundleMessageSource messageFuckingSource(){
+    ResourceBundleMessageSource messageSource(){
         var messageSource = new ResourceBundleMessageSource();
         messageSource.setUseCodeAsDefaultMessage(true);
         messageSource.setBasenames("messages");
